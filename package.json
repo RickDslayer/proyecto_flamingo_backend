@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for the Flamingo project using Node.js, Express, and MySQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ricardo vargas",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-myconnection": "^1.0.4",
+    "mysql": "^2.18.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
+
