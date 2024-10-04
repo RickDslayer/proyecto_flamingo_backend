@@ -1,110 +1,69 @@
 const controller = {};
 
-// Obtener la lista de usuarios activos
+// Listar todos los usuarios (GET)
 controller.list = (req, res) => {
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('SELECT * FROM user WHERE active = TRUE', (err, users) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al obtener los usuarios' });
-            }
-            res.status(200).json(users);
-        });
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos', details: err });
+
+    conn.query('SELECT * FROM user WHERE active = TRUE', (err, users) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener los usuarios', details: err });
+      res.json(users);  // Enviar los usuarios como JSON
     });
+  });
 };
 
-// Guardar un nuevo usuario
+// Guardar un nuevo usuario (POST)
 controller.save = (req, res) => {
-    const data = req.body;
+  const data = req.body;  // Obtener los datos del cuerpo de la solicitud
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos', details: err });
 
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('INSERT INTO user SET ?', [data], (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al guardar el usuario' });
-            }
-            res.status(201).json({ message: 'Usuario creado', userId: result.insertId });
-        });
+    conn.query('INSERT INTO user SET ?', [data], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al guardar el usuario', details: err });
+      res.json({ message: 'Usuario agregado exitosamente', result });
     });
+  });
 };
 
-// Eliminar (desactivar) un usuario por ID
+// Eliminar (desactivar) un usuario (DELETE)
 controller.delete = (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;  // Obtener el ID de los parámetros de la solicitud
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos', details: err });
 
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('UPDATE user SET active = FALSE WHERE id = ?', [id], (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al desactivar el usuario' });
-            }
-            res.status(200).json({ message: 'Usuario desactivado' });
-        });
+    conn.query('UPDATE user SET active = FALSE WHERE id = ?', [id], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al desactivar el usuario', details: err });
+      res.json({ message: 'Usuario desactivado exitosamente', result });
     });
+  });
 };
 
-// Editar un usuario por ID
+// Obtener un usuario para edición (GET)
 controller.edit = (req, res) => {
-    const { id } = req.params;
+  const { id } = req.params;  // Obtener el ID de los parámetros de la solicitud
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos', details: err });
 
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('SELECT * FROM user WHERE id = ?', [id], (err, user) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al obtener los datos del usuario' });
-            }
-            if (user.length === 0) {
-                return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
-            res.status(200).json(user[0]);
-        });
+    conn.query('SELECT * FROM user WHERE id = ?', [id], (err, user) => {
+      if (err) return res.status(500).json({ error: 'Error al obtener el usuario', details: err });
+      res.json(user[0]);  // Enviar solo el primer usuario
     });
+  });
 };
 
-// Actualizar un usuario por ID
+// Actualizar un usuario (PUT)
 controller.update = (req, res) => {
-    const { id } = req.params;
-    const newUser = req.body;
+  const { id } = req.params;  // Obtener el ID de los parámetros de la solicitud
+  const newUser = req.body;  // Obtener los datos del cuerpo de la solicitud
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: 'Error de conexión a la base de datos', details: err });
 
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('UPDATE user SET ? WHERE id = ?', [newUser, id], (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al actualizar el usuario' });
-            }
-            res.status(200).json({ message: 'Usuario actualizado' });
-        });
+    conn.query('UPDATE user SET ? WHERE id = ?', [newUser, id], (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al actualizar el usuario', details: err });
+      res.json({ message: 'Usuario actualizado exitosamente', result });
     });
-};
-
-// Buscar usuario por nombre
-controller.search = (req, res) => {
-    const { id } = req.params;  // Obtenemos el ID desde los parámetros de la URL
-
-    req.getConnection((err, conn) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error en la conexión a la base de datos' });
-        }
-        conn.query('SELECT * FROM user WHERE id = ?', [id], (err, user) => {
-            if (err) {
-                return res.status(500).json({ error: 'Error al buscar el usuario' });
-            }
-            if (user.length === 0) {
-                return res.status(404).json({ message: 'Usuario no encontrado' });
-            }
-            res.status(200).json(user[0]);  // Devolvemos el primer (y único) resultado
-        });
-    });
+  });
 };
 
 module.exports = controller;
+

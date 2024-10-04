@@ -1,69 +1,68 @@
 const controller = {};
 
-// Listar todos los viajes
+// Listar todos los tickets
 controller.list = (req, res) => {
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: err });
 
-    conn.query('SELECT * FROM trip', (err, trips) => {
+    conn.query('SELECT * FROM ticket', (err, tickets) => {
       if (err) return res.status(500).json({ error: err });
-      res.json(trips);
+      res.json(tickets);
     });
   });
 };
 
-// Guardar un nuevo viaje
+// Guardar un nuevo ticket
 controller.save = (req, res) => {
   const data = req.body;
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: err });
 
-    conn.query('INSERT INTO trip SET ?', [data], (err, result) => {
+    conn.query('INSERT INTO ticket SET ?', [data], (err, result) => {
       if (err) return res.status(500).json({ error: err });
-      res.json({ message: 'Viaje agregado', result });
+      res.json({ message: 'Ticket agregado', result });
     });
   });
 };
 
-// Eliminar viaje
+// Eliminar ticket
 controller.delete = (req, res) => {
   const { id } = req.params;
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: err });
 
-    conn.query('DELETE FROM trip WHERE id = ?', [id], (err, result) => {
+    conn.query('DELETE FROM ticket WHERE id = ?', [id], (err, result) => {
       if (err) return res.status(500).json({ error: err });
-      res.json({ message: 'Viaje eliminado', result });
+      res.json({ message: 'Ticket eliminado', result });
     });
   });
 };
 
-// Editar viaje
+// Editar ticket
 controller.edit = (req, res) => {
   const { id } = req.params;
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: err });
 
-    conn.query('SELECT * FROM trip WHERE id = ?', [id], (err, trip) => {
+    conn.query('SELECT * FROM ticket WHERE id = ?', [id], (err, ticket) => {
       if (err) return res.status(500).json({ error: err });
-      res.json(trip[0]);
+      res.json(ticket[0]);
     });
   });
 };
 
-// Actualizar viaje
+// Actualizar ticket
 controller.update = (req, res) => {
   const { id } = req.params;
-  const newTrip = req.body;
+  const newTicket = req.body;
   req.getConnection((err, conn) => {
     if (err) return res.status(500).json({ error: err });
 
-    conn.query('UPDATE trip SET ? WHERE id = ?', [newTrip, id], (err, result) => {
+    conn.query('UPDATE ticket SET ? WHERE id = ?', [newTicket, id], (err, result) => {
       if (err) return res.status(500).json({ error: err });
-      res.json({ message: 'Viaje actualizado', result });
+      res.json({ message: 'Ticket actualizado', result });
     });
   });
 };
 
 module.exports = controller;
-

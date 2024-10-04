@@ -1,78 +1,68 @@
 const controller = {};
 
-
+// Listar todas las terminales
 controller.list = (req, res) => {
-    req.getConnection((err, conn) => {
-        conn.query('SELECT * FROM terminal WHERE active = TRUE', (err, users) => {
-            if(err){
-                res.json(err);
-            }
-            console.log(users);
-            res.render('admin_terminal', {
-                data: users
-            });
-        });
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
+
+    conn.query('SELECT * FROM terminal', (err, terminals) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(terminals);
     });
+  });
 };
 
+// Guardar una nueva terminal
 controller.save = (req, res) => {
+  const data = req.body;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
 
-    const data = req.body;
-
-    req.getConnection((err, conn) => {
-        console.log('ok');
-        conn.query('INSERT INTO terminal set ?', [data], (err, user) => {
-            console.log(err);
-            res.redirect('admin_terminal');
-        });
-    })
-}
-
-controller.delete = (req,res) => {
-
-const {id} = req.params;
-
-    req.getConnection((err, conn) => {
-        if (err) {
-            // Manejar el error si la conexión falla
-            console.log(err);
-            return res.status(500).send('Error interno del servidor');
-        }
-        conn.query('UPDATE terminal SET active = FALSE WHERE id = ?', [id], (err, rows) => {
-            if (err) {
-                // Manejar el error si la eliminación falla
-                console.log(err);
-                return res.status(500).send('Error interno del servidor');
-            }
-            // Redirigir a la página principal de administración de usuarios después de la eliminación
-            res.redirect('/admin_terminal');
-        });
-    })
+    conn.query('INSERT INTO terminal SET ?', [data], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Terminal agregada', result });
+    });
+  });
 };
 
-controller.edit = (req,res) => {
+// Eliminar terminal
+controller.delete = (req, res) => {
+  const { id } = req.params;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
 
-    const {id} = req.params;
-
-    req.getConnection((err, conn) => {
-        conn.query('SELECT * FROM terminal WHERE id= ?', [id], (err, user) => {
-            res.render('admin_terminalEdit', {
-                data: user[0]
-            })
-        });
+    conn.query('DELETE FROM terminal WHERE id = ?', [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Terminal eliminada', result });
     });
+  });
 };
 
-controller.update = (req,res) => {
-    
-    const {id} = req.params;
-    const newUser = req.body;
+// Editar terminal
+controller.edit = (req, res) => {
+  const { id } = req.params;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
 
-    req.getConnection((err, conn) => {
-        conn.query('UPDATE terminal set ? WHERE id = ?', [newUser, id], (err, user) => {
-            res.redirect('/admin_terminal')
-        });
+    conn.query('SELECT * FROM terminal WHERE id = ?', [id], (err, terminal) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(terminal[0]);
     });
+  });
+};
+
+// Actualizar terminal
+controller.update = (req, res) => {
+  const { id } = req.params;
+  const newTerminal = req.body;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
+
+    conn.query('UPDATE terminal SET ? WHERE id = ?', [newTerminal, id], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Terminal actualizada', result });
+    });
+  });
 };
 
 module.exports = controller;

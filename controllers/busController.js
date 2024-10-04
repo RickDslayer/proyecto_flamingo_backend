@@ -1,118 +1,69 @@
 const controller = {};
 
-// Lista los buses y los conductores
+// Listar todos los buses
 controller.list = (req, res) => {
-    req.getConnection((err, conn) => {
-        if (err) return res.status(500).send(err);
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
 
-        const getBuses = new Promise((resolve, reject) => {
-            const query = `
-                SELECT bus.*, user.name AS conductor_nombre 
-                FROM bus 
-                LEFT JOIN user ON bus.user_id = user.id 
-                WHERE bus.active = TRUE`;
-            conn.query(query, (err, buses) => {
-                if (err) {
-                    console.log('Error al obtener los buses:', err);
-                    reject(err);
-                } else {
-                    console.log('Buses obtenidos:', buses);
-                    resolve(buses);
-                }
-            });
-        });
-
-        const getConductores = new Promise((resolve, reject) => {
-            conn.query('SELECT id, name FROM user WHERE rol = "conductor"', (err, conductores) => {
-                if (err) {
-                    console.log('Error al obtener los conductores:', err);
-                    reject(err);
-                } else {
-                    console.log('Conductores obtenidos:', conductores);
-                    resolve(conductores);
-                }
-            });
-        });
-
-        Promise.all([getBuses, getConductores])
-            .then(([buses, conductores]) => {
-                res.render('admin_bus', {
-                    data: buses,
-                    conductores: conductores
-                });
-            })
-            .catch(err => {
-                res.status(500).send(err);
-            });
+    conn.query('SELECT * FROM bus', (err, buses) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(buses);
     });
+  });
 };
 
-// Guarda un nuevo bus
+// Guardar un nuevo bus
 controller.save = (req, res) => {
-    const data = req.body;
-    req.getConnection((err, conn) => {
-        if (err) return res.status(500).send(err);
-        conn.query('INSERT INTO bus SET ?', [data], (err, bus) => {
-            if (err) return res.status(500).send(err);
-            res.redirect('/admin_bus');
-        });
+  const data = req.body;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
+
+    conn.query('INSERT INTO bus SET ?', [data], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Bus agregado', result });
     });
+  });
 };
 
-// Elimina (desactiva) un bus
+// Eliminar bus
 controller.delete = (req, res) => {
-    const { id } = req.params;
-    req.getConnection((err, conn) => {
-        if (err) return res.status(500).send(err);
-        conn.query('UPDATE bus SET active = FALSE WHERE id = ?', [id], (err, rows) => {
-            if (err) return res.status(500).send(err);
-            res.redirect('/admin_bus');
-        });
+  const { id } = req.params;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
+
+    conn.query('DELETE FROM bus WHERE id = ?', [id], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Bus eliminado', result });
     });
+  });
 };
 
-// Edita un bus
+// Editar bus
 controller.edit = (req, res) => {
-    const { id } = req.params;
-    req.getConnection((err, conn) => {
-        const getBus = new Promise((resolve, reject) => {
-            conn.query('SELECT * FROM bus WHERE id = ?', [id], (err, bus) => {
-                if (err) reject(err);
-                resolve(bus[0]);
-            });
-        });
+  const { id } = req.params;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
 
-        const getConductores = new Promise((resolve, reject) => {
-            conn.query('SELECT id, name FROM user WHERE rol = "conductor"', (err, conductores) => {
-                if (err) reject(err);
-                resolve(conductores);
-            });
-        });
-
-        Promise.all([getBus, getConductores])
-            .then(([bus, conductores]) => {
-                res.render('admin_busEdit', {
-                    data: bus,
-                    conductores: conductores
-                });
-            })
-            .catch(err => {
-                res.status(500).send(err);
-            });
+    conn.query('SELECT * FROM bus WHERE id = ?', [id], (err, bus) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(bus[0]);
     });
+  });
 };
 
-// Actualiza un bus
+// Actualizar bus
 controller.update = (req, res) => {
-    const { id } = req.params;
-    const newBus = req.body;
-    req.getConnection((err, conn) => {
-        if (err) return res.status(500).send(err);
-        conn.query('UPDATE bus SET ? WHERE id = ?', [newBus, id], (err, bus) => {
-            if (err) return res.status(500).send(err);
-            res.redirect('/admin_bus');
-        });
+  const { id } = req.params;
+  const newBus = req.body;
+  req.getConnection((err, conn) => {
+    if (err) return res.status(500).json({ error: err });
+
+    conn.query('UPDATE bus SET ? WHERE id = ?', [newBus, id], (err, result) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Bus actualizado', result });
     });
+  });
 };
 
 module.exports = controller;
+
