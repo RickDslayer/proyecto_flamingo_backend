@@ -12,62 +12,61 @@ const tripController = require('../controllers/tripController');
 const clientController = require('../controllers/clientController');
 const ticketController = require('../controllers/ticketController')
 
-router.get('/', loginController.load);
+router.get('/login', loginController.load);
 
 //users
-router.get('/', userController.list);           // Listar usuarios (GET)
-router.post('/', userController.save);          // Guardar nuevo usuario (POST)
-router.delete('/:id', userController.delete);   // Eliminar (desactivar) usuario (DELETE)
-router.get('/:id', userController.edit);        // Obtener un usuario (GET)
-router.put('/:id', userController.update); 
+router.get('/list_user', userController.list);           // Listar usuarios (GET)
+router.post('/save_user', userController.save);          // Guardar nuevo usuario (POST)
+router.delete('/delete_user:id', userController.delete);   // Eliminar (desactivar) usuario (DELETE)
+router.get('/edit_user:id', userController.edit);        // Obtener un usuario (GET)
+router.put('/update_user:id', userController.update); 
 
 //employee
-router.get('/', employeeController.list);
-router.post('/', employeeController.save);
-router.delete('/:id', employeeController.delete);
-router.get('/:id', employeeController.edit);
-router.put('/:id', employeeController.update);
+router.get('/list_employee', employeeController.list);
+router.post('/save_employee', employeeController.save);
+router.delete('/delete_employee:id', employeeController.delete);
+router.get('/edit_employee:id', employeeController.edit);
+router.put('/update_employee:id', employeeController.update);
 
 //ticket
-router.get('/', ticketController.list);
-router.post('/', ticketController.save);
-router.delete('/:id', ticketController.delete);
-router.get('/:id', ticketController.edit);
-router.put('/:id', ticketController.update);
+router.get('/list_ticket', ticketController.list);
+router.post('/save_ticket', ticketController.save);
+router.delete('/delete_ticket:id', ticketController.delete);
+router.get('/edit_ticket:id', ticketController.edit);
+router.put('/update_ticket:id', ticketController.update);
 
 //login
 router.post('/logeo', loginController.login);
 
 //register
-router.get('/register', registerController.load);//
 router.post('/register', registerController.storeUser);
 
-//test
-router.get('/test', testController.load);//
-
 //bus
-router.get('/', busController.list);
-router.post('/', busController.save);
-router.delete('/:id', busController.delete);
-router.get('/:id', busController.edit);
-router.put('/:id', busController.update);
+router.get('/list_bus', busController.list);
+router.post('/save_bus', busController.save);
+router.delete('/delete_bus:id', busController.delete);
+router.get('/edit_bus:id', busController.edit);
+router.put('/update_bus:id', busController.update);
 
 //terminal
-router.get('/', terminalController.list);
-router.post('/', terminalController.save);
-router.delete('/:id', terminalController.delete);
-router.get('/:id', terminalController.edit);
-router.put('/:id', terminalController.update);
+router.get('/list_terminal', terminalController.list);
+router.post('/save_terminal', terminalController.save);
+router.delete('/delete_terminal:id', terminalController.delete);
+router.get('/edit_terminal:id', terminalController.edit);
+router.put('/update_terminal:id', terminalController.update);
 
 //trip
-router.get('/', tripController.list);
-router.post('/', tripController.save);
-router.delete('/:id', tripController.delete);
-router.get('/:id', tripController.edit);
-router.put('/:id', tripController.update);
+router.get('/list_trip', tripController.list);
+router.post('/save_trip', tripController.save);
+router.delete('/delete_trip:id', tripController.delete);
+router.get('/edit_trip:id', tripController.edit);
+router.put('/update_trip:id', tripController.update);
 
 //client
-router.get('/client', clientController.list);
-router.get('/searchClient', clientController.search);
+router.get('/list_client', clientController.list);
+router.post('/save_client', clientController.save);
+router.delete('/delete_client:id', clientController.delete);
+router.get('/edit_client:id', clientController.edit);
+router.put('/update_client:id', clientController.update);
 
 module.exports = router;
