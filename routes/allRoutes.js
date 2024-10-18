@@ -12,14 +12,13 @@ const tripController = require('../controllers/tripController');
 const clientController = require('../controllers/clientController');
 const ticketController = require('../controllers/ticketController')
 
-router.get('/login', loginController.load);
-
 //users
 router.get('/list_user', userController.list);           // Listar usuarios (GET)
 router.post('/save_user', userController.save);          // Guardar nuevo usuario (POST)
 router.delete('/delete_user:id', userController.delete);   // Eliminar (desactivar) usuario (DELETE)
 router.get('/edit_user:id', userController.edit);        // Obtener un usuario (GET)
-router.put('/update_user:id', userController.update); 
+router.put('/update_user:id', userController.update);  
+router.put('/update_role:mail', userController.updateRole);
 
 //employee
 router.get('/list_employee', employeeController.list);

@@ -65,5 +65,72 @@ controller.update = (req, res) => {
   });
 };
 
+// Cambiar el rol de un usuario (PUT)
+controller.updateRole = (req, res) => {
+  const { mail, newRole } = req.body;
+
+  if (newRole !== 'employee') {
+    return res.status(400).json('El nuevo rol debe ser empleado');
+  }
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error('Error al establecer la conexión:', err);
+      return res.status(500).json('Error interno del servidor');
+    }
+
+    // Buscar al usuario por su correo
+    conn.query('SELECT * FROM user WHERE mail = ?', [mail], (err, userdata) => {
+      if (err) {
+        console.error('Error al ejecutar la consulta:', err);
+        return res.status(500).json('Error interno del servidor');
+      }
+
+      if (userdata.length === 0) {
+        return res.status(404).json('Usuario no encontrado');
+      }
+
+      const user = userdata[0];
+
+      // Verificar si el usuario ya es empleado
+      if (user.role === 'employee') {
+        return res.status(400).json('El usuario ya es empleado');
+      }
+
+      // Actualizar el role del usuario a 'employee'
+      conn.query('UPDATE user SET role = ? WHERE id = ?', ['employee', user.id], (err, result) => {
+        if (err) {
+          console.error('Error al actualizar el rol del usuario:', err);
+          return res.status(500).json('Error interno del servidor');
+        }
+
+        // Eliminar la relación del cliente en la tabla client
+        conn.query('DELETE FROM client WHERE user_id = ?', [user.id], (err, result) => {
+          if (err) {
+            console.error('Error al eliminar el cliente:', err);
+            return res.status(500).json('Error interno del servidor');
+          }
+
+          // Insertar la nueva relación en la tabla employee
+          const employeeData = { user_id: user.id };
+
+          conn.query('INSERT INTO employee SET ?', [employeeData], (err, result) => {
+            if (err) {
+              console.error('Error al insertar el empleado:', err);
+              return res.status(500).json('Error interno del servidor');
+            }
+
+            return res.status(200).json({
+              message: 'Usuario actualizado a empleado exitosamente',
+              user: { id: user.id, mail: user.mail, role: 'employee' },
+              employee: { id: result.insertId }
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
 module.exports = controller;
 
